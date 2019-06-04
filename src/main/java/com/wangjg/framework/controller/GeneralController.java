@@ -20,7 +20,7 @@ import java.lang.reflect.Type;
 
 @SuppressWarnings({"unchecked", "WeakerAccess", "unused", "SpringJavaAutowiredMembersInspection", "SpringJavaInjectionPointsAutowiringInspection"})
 @Slf4j
-public class GeneralController<S extends IService<E>, E, V> extends BaseController<E> {
+public class GeneralController<S extends IService<E>, E, V> extends BaseController {
     private static final String TAG = "通用 WEB 控制器";
 
     @Autowired
