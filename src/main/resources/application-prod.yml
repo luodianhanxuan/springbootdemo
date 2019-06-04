@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://47.104.200.143:7306/demo?allowMultiQueries=true&useSSL=false
+    username: root
+    password: d2FuZ2pnMDcyNA==
+    driver-class-name: com.mysql.jdbc.Driver

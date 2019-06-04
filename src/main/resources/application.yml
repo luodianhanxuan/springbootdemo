@@ -1,0 +1,18 @@
+mybatis-plus:
+  # MyBatis Mapper 所对应的 XML 文件位置 如果在 Mapper 中有自定义方法（XML 中有自定义实现），需要进行该配置，告诉 Mapper 所对应的 XML 文件位置。
+  mapper-locations: classpath*:com/wangjg/framework/mapper/**/*.xml
+  # MyBaits 别名包扫描路径
+  type-aliases-package: com.wangjg.framework.pojo.entity
+  # 仅仅会扫描路径下以该类作为父类的域对象
+  type-aliases-super-type: java.lang.Object
+  checkConfigLocation: true
+  global-config:
+    # 配置逻辑删除字段为1是删除
+    db-config:
+      # 配置逻辑删除字段为2是已删除
+      logic-delete-value: 2
+      # 配置逻辑删除字段为1是未删除
+      logic-not-delete-value: 1
+spring:
+  profiles:
+    active: dev
