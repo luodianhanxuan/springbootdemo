@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -108,6 +110,35 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
     private void dataCheck4Del(E entity) {
 
     }
+
+    @DeleteMapping
+    public boolean del(String[] ids) {
+        if (ids == null || ids.length <= 0) {
+            log.info(String.format("%s：要删除的 id 为空", TAG));
+            return Boolean.TRUE;
+        }
+
+        List<String> idList = Arrays.asList(ids);
+
+        Collection<E> entities = service.listByIds(idList);
+
+        try {
+            dataCheck4Del(entities);
+        } catch (Exception e) {
+            log.info(String.format("%s：删除数据验证不通过", TAG));
+            // TODO
+            return Boolean.FALSE;
+        }
+
+        final boolean b = service.removeByIds(idList);
+        log.info(String.format("%s：删除数据%s", TAG, b ? "成功" : "失败"));
+        return b;
+    }
+
+    private void dataCheck4Del(Collection<E> entities) {
+
+    }
+
 
     @GetMapping("/{id}")
     public V get(@PathVariable("id") String id) {
