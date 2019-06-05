@@ -16,11 +16,10 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author wangjg
- * @since 2019-06-04
+ * @since 2019-06-05
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
 public class SchoolVO implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 2019-06-04
  */
 @SpringBootApplication
-@MapperScan(basePackages = "com.wangjg.framework.mapper")
 public class SpringBootDemoApplication {
 
     public static void main(String[] args) {

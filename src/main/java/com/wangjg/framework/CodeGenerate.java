@@ -23,7 +23,7 @@ public class CodeGenerate {
      * 读取控制台内容
      * </p>
      */
-    public static String scanner(String tip) {
+    private static String scanner(String tip) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("请输入" + tip + "：");
         if (scanner.hasNext()) {
@@ -33,10 +33,6 @@ public class CodeGenerate {
             }
         }
         throw new MybatisPlusException("请输入正确的" + tip + "！");
-    }
-
-    public static void main1(String[] args) {
-        System.out.println(System.getProperty("user.dir"));
     }
 
     public static void main(String[] args) {

@@ -91,6 +91,13 @@ public class ReflectUtil {
     /**
      * 判断两个相同类型的对象的属性值是否相等
      */
+    public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond) throws Exception {
+        return comparePropertiesWithDifferentValue(first, sencond, null, null);
+    }
+
+    /**
+     * 判断两个相同类型的对象的属性值是否相等
+     */
     public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond, String[] excludeFields) throws Exception {
         return comparePropertiesWithDifferentValue(first, sencond, null, excludeFields);
     }
@@ -119,7 +126,7 @@ public class ReflectUtil {
         List<CompareDifferentResult> differentFields = new ArrayList<>();
         CompareDifferentResult result;
         Object firstValue;
-        Object sencondValue;
+        Object secondField;
         for (Field field : fields) {
             if (fieldNames != null
                     && fieldNames.length > 0
@@ -136,12 +143,12 @@ public class ReflectUtil {
                 Method getMethod = propertyDescriptor.getReadMethod();//从属性描述中获得字段的get方法
                 //通过getMethod.invoke(obj)方法获得obj对象中该字段get方法返回的值
                 firstValue = getMethod.invoke(first);
-                sencondValue = getMethod.invoke(sencond);
-                if (!Objects.equals(firstValue, sencondValue)) {
-                    result = new CompareDifferentResult();
+                secondField = getMethod.invoke(sencond);
+                if (!Objects.equals(firstValue, secondField)) {
+                    result = new CompareDifferentResult(getPrimitive2BoxTypeClassIfNeed(field.getType()));
                     result.setField(underline(field.getName()));
                     result.setFirstValue(firstValue);
-                    result.setSencondValue(sencondValue);
+                    result.setSencondValue(secondField);
                     differentFields.add(result);
                 }
             } catch (Exception e) {
@@ -156,14 +163,10 @@ public class ReflectUtil {
         private String field;
         private Object firstValue;
         private Object sencondValue;
+        private Class type;
 
-        public CompareDifferentResult() {
-        }
-
-        public CompareDifferentResult(String field, Object firstValue, Object sencondValue) {
-            this.field = field;
-            this.firstValue = firstValue;
-            this.sencondValue = sencondValue;
+        public CompareDifferentResult(Class type) {
+            this.type = type;
         }
 
         @Override
@@ -198,6 +201,14 @@ public class ReflectUtil {
         public void setSencondValue(Object sencondValue) {
             this.sencondValue = sencondValue;
         }
+
+        public Class getType() {
+            return type;
+        }
+
+        public void setType(Class type) {
+            this.type = type;
+        }
     }
 
     public static List<String> fields(Object obj) {
@@ -206,7 +217,7 @@ public class ReflectUtil {
 
     public static List<String> fields(Object obj, String[] excludeNames) {
         Field[] declaredFields = obj.getClass().getDeclaredFields();
-        if (declaredFields == null || declaredFields.length <= 0) {
+        if (declaredFields.length <= 0) {
             return new ArrayList<>();
         }
 
@@ -535,5 +546,8 @@ public class ReflectUtil {
         } catch (InvocationTargetException e) {
             LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法调用失败", TAG, className, fieldName, setterMethodName));
         }
+    }
+
+    public static void main(String[] args) {
     }
 }

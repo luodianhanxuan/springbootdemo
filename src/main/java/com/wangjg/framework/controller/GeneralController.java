@@ -1,24 +1,29 @@
 package com.wangjg.framework.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wangjg.framework.pojo.vo.PageSearch;
+import com.wangjg.framework.util.CollectionUtil;
 import com.wangjg.framework.util.StringUtil;
+import com.wangjg.framework.util.WrapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author wangjg
  * 2019-06-04
  */
 
-@SuppressWarnings({"unchecked", "WeakerAccess", "unused", "SpringJavaAutowiredMembersInspection", "SpringJavaInjectionPointsAutowiringInspection"})
+@SuppressWarnings({"unchecked", "WeakerAccess", "unused", "SpringJavaInjectionPointsAutowiringInspection"})
 @Slf4j
 public class GeneralController<S extends IService<E>, E, V> extends BaseController {
     private static final String TAG = "通用 WEB 控制器";
@@ -41,7 +46,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return vo;
         }
 
-        Class<E> eClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+        Class<E> eClass = this.getClazz4Entity();
         E entity;
         try {
             entity = eClass.newInstance();
@@ -51,29 +56,27 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return vo;
         }
 
-        Converter<V, E> converter4VO2Entity = this.getConverter4VO2Entity(vo, entity);
-        converter4VO2Entity.convert(vo, entity);
+        final E e = this.vo2entity(vo, entity);
 
         final boolean b = service.saveOrUpdate(entity);
         log.info(String.format("%s：实体【%s】保存%s", TAG, entity, b ? "成功" : "失败"));
 
-        final Converter<E, V> converter4Entity2VO = getConverter4Entity2VO(entity, vo);
-        converter4Entity2VO.convert(entity, vo);
+        return this.entity2vo(entity, vo);
+    }
 
+    private V entity2vo(E entity, V vo) {
+        BeanUtils.copyProperties(entity, vo);
         return vo;
+    }
+
+    private E vo2entity(V vo, E entity) {
+        BeanUtils.copyProperties(vo, entity);
+        return entity;
     }
 
     protected void dataCheck4Save(V vo) {
     }
 
-
-    protected Converter<E, V> getConverter4Entity2VO(E entity, V vo) {
-        return new DefaultConverter<>();
-    }
-
-    protected Converter<V, E> getConverter4VO2Entity(V vo, E entity) {
-        return new DefaultConverter<>();
-    }
 
     @DeleteMapping("/{id}")
     public String del(@PathVariable("id") String id) {
@@ -118,8 +121,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return null;
         }
 
-        final Type[] actualTypeArguments = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments();
-        Class<V> vClass = (Class<V>) actualTypeArguments[2];
+        Class<V> vClass = this.getClazz4VO();
         V vo;
 
         try {
@@ -133,22 +135,101 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return null;
         }
 
-        Converter<E, V> converter = this.getConverter4Entity2VO(entity, vo);
-        converter.convert(entity, vo);
-        return vo;
+        return this.entity2vo(entity, vo);
     }
 
-    public interface Converter<O, D> {
-        @SuppressWarnings("UnusedReturnValue")
-        D convert(O original, D destination);
+    private Class<E> getClazz4Entity() {
+        return (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
 
-    public class DefaultConverter<O, D> implements Converter<O, D> {
-        @Override
-        public D convert(O original, D destination) {
-            BeanUtils.copyProperties(original, destination);
-            return destination;
+    private Class<V> getClazz4VO() {
+        return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[2];
+    }
+
+    @GetMapping("/list")
+    public List<V> list(V vo) {
+        if (vo == null) {
+            log.info(String.format("%s：系统异常 vo 不能为 null", TAG));
+            // TODO
+            return new ArrayList<>();
         }
+
+        Wrapper<E> queryWrapper = this.getWrapperByVO(vo);
+        if (queryWrapper == null) {
+            queryWrapper = new QueryWrapper<>();
+        }
+
+        final List<E> entityList = service.list(queryWrapper);
+
+        return this.entityList2VoList(entityList);
     }
 
+    @PostMapping("/page")
+    public IPage<V> page(@RequestBody PageSearch<V> pageSearch) {
+        if (pageSearch == null) {
+            log.info(String.format("%s：系统异常 vo 不能为 null", TAG));
+            // TODO
+            return null;
+        }
+        Page<V> pageInfo = pageSearch.getPage();
+        Page<E> page = this.getPage(pageInfo);
+        final V vo = pageSearch.getSearch();
+        Wrapper<E> queryWrapper = null;
+        if (vo != null) {
+            queryWrapper = this.getWrapperByVO(vo);
+        }
+        if (queryWrapper == null) {
+            queryWrapper = new QueryWrapper<>();
+        }
+
+        final IPage<E> pageData = service.page(page, queryWrapper);
+        if (pageData == null) {
+            // TODO
+            return null;
+        }
+        final List<E> records = pageData.getRecords();
+        final List<V> voList = this.entityList2VoList(records);
+        BeanUtils.copyProperties(pageData, pageInfo);
+        pageInfo.setRecords(voList);
+        return pageInfo;
+    }
+
+    protected Page<E> getPage(Page<V> pageInfo) {
+        final Page<E> page = new Page<>();
+        BeanUtils.copyProperties(pageInfo, page);
+
+        String[] desc = desc(pageInfo);
+        String[] asc = asc(pageInfo);
+
+        if (desc != null) {
+            page.setDesc(desc);
+        }
+        if (asc != null) {
+            page.setAsc(asc);
+        }
+        return page;
+    }
+
+    private String[] asc(Page<V> pageInfo) {
+        return null;
+    }
+
+    private String[] desc(Page<V> pageInfo) {
+        return null;
+    }
+
+    private List<V> entityList2VoList(List<E> entityList) {
+        final Class<V> clazz4VO = this.getClazz4VO();
+        return CollectionUtil.transferFromList2ToList(clazz4VO, entityList);
+    }
+
+    protected Wrapper<E> getWrapperByVO(V vo) {
+        final Class<V> voClazz = getClazz4VO();
+        final Class<E> entityClazz = getClazz4Entity();
+        QueryWrapper<E> wrapper = WrapperUtil.getWrapperByVO(entityClazz, voClazz, vo);
+        if (wrapper == null) {
+            wrapper = new QueryWrapper<>();
+        }
+        return wrapper;
+    }
 }

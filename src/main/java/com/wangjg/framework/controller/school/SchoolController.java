@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author wangjg
- * @since 2019-06-04
+ * @since 2019-06-05
  */
 @RestController
 @RequestMapping("/school")
