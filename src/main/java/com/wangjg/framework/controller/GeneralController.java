@@ -34,7 +34,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
     protected S service;
 
     @PostMapping
-    public V save(V vo) {
+    public V save(@RequestBody V vo) {
         if (vo == null) {
             log.info(String.format("%s：vo 对象不能为 null", TAG));
             return null;
