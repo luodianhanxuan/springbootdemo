@@ -350,17 +350,6 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
     }
 
     /**
-     * 根据entitylist构造volist并返回
-     *
-     * @param entityList 数据库映射对象集合
-     * @return 提供给客户端的参数封装对象集合
-     */
-    protected List<V> entityList2VoList(List<E> entityList) {
-        final Class<V> clazz4VO = this.getClazz4VO();
-        return CollectionUtil.transferFromList2ToList(clazz4VO, entityList);
-    }
-
-    /**
      * 获取数据库映射对象的类型
      *
      * @return 数据库映射对象的类型
@@ -376,6 +365,18 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      */
     private Class<V> getClazz4VO() {
         return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[2];
+    }
+
+
+    /**
+     * 根据entitylist构造volist并返回
+     *
+     * @param entityList 数据库映射对象集合
+     * @return 提供给客户端的参数封装对象集合
+     */
+    protected List<V> entityList2VoList(List<E> entityList) {
+        final Class<V> clazz4VO = this.getClazz4VO();
+        return CollectionUtil.transferFromList2ToList(clazz4VO, entityList);
     }
 
     /**
@@ -548,7 +549,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @param pageInfo 分页参数封装对象
      * @return 分页列表升序字段数组
      */
-    private String[] asc(Page<V> pageInfo) {
+    protected String[] asc(Page<V> pageInfo) {
         return null;
     }
 
@@ -558,7 +559,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @param pageInfo 分页参数封装对象
      * @return 分页列表升序字段数组
      */
-    private String[] desc(Page<V> pageInfo) {
+    protected String[] desc(Page<V> pageInfo) {
         return null;
     }
 }
