@@ -5,10 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wangjg.framework.exception.DataCheckException;
 import com.wangjg.framework.pojo.vo.PageSearch;
 import com.wangjg.framework.util.CollectionUtil;
 import com.wangjg.framework.util.StringUtil;
-import com.wangjg.framework.util.WrapperUtil;
+import com.wangjg.framework.util.wrapper.WrapperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,18 @@ import java.util.List;
 public class GeneralController<S extends IService<E>, E, V> extends BaseController {
     private static final String TAG = "通用 WEB 控制器";
 
+    /**
+     * service for entity
+     */
     @Autowired
     protected S service;
 
+    /**
+     * 根据 VO 对象插入或更新数据（VO 中主键字段有值则更新，无值则插入）
+     *
+     * @param vo 参数对象
+     * @return 保存后的展示实体
+     */
     @PostMapping
     public V save(@RequestBody V vo) {
         if (vo == null) {
@@ -41,8 +51,9 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         }
 
         try {
+            // 对参数进行校验，校验不通过则抛出指定校验异常
             this.dataCheck4Save(vo);
-        } catch (Exception e) {
+        } catch (DataCheckException e) {
             log.info(String.format("%s：保存VO【%s】验证不通过", TAG, vo));
             // TODO
             return vo;
@@ -58,25 +69,25 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return vo;
         }
 
-        final E e = this.vo2entity(vo, entity);
+        final E e = this.vo2Entity(vo, entity);
 
         final boolean b = service.saveOrUpdate(entity);
         log.info(String.format("%s：实体【%s】保存%s", TAG, entity, b ? "成功" : "失败"));
 
-        return this.entity2vo(entity, vo);
+        return this.entity2Vo(entity, vo);
     }
 
-    private V entity2vo(E entity, V vo) {
+    private V entity2Vo(E entity, V vo) {
         BeanUtils.copyProperties(entity, vo);
         return vo;
     }
 
-    private E vo2entity(V vo, E entity) {
+    private E vo2Entity(V vo, E entity) {
         BeanUtils.copyProperties(vo, entity);
         return entity;
     }
 
-    protected void dataCheck4Save(V vo) {
+    protected void dataCheck4Save(V vo) throws DataCheckException {
     }
 
 
@@ -96,7 +107,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         }
         try {
             dataCheck4Del(entity);
-        } catch (Exception e) {
+        } catch (DataCheckException e) {
             log.info(String.format("%s：删除数据【%s】验证不通过", TAG, entity));
             // TODO
             return id;
@@ -107,7 +118,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         return id;
     }
 
-    private void dataCheck4Del(E entity) {
+    private void dataCheck4Del(E entity) throws DataCheckException {
 
     }
 
@@ -135,7 +146,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         return b;
     }
 
-    private void dataCheck4Del(Collection<E> entities) {
+    private void dataCheck4Del(Collection<E> entities) throws DataCheckException {
 
     }
 
@@ -166,7 +177,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
             return null;
         }
 
-        return this.entity2vo(entity, vo);
+        return this.entity2Vo(entity, vo);
     }
 
     private Class<E> getClazz4Entity() {
