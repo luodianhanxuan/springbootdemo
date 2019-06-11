@@ -300,7 +300,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
 
         this.preListCondition(vo);
 
-        Wrapper<E> queryWrapper = this.getWrapperByVO(vo);
+        Wrapper<E> queryWrapper = this.getWrapperByVO(vo, false);
         if (queryWrapper == null) {
             queryWrapper = new QueryWrapper<>();
         }
@@ -331,7 +331,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         this.preListCondition(vo);
         Wrapper<E> queryWrapper = null;
         if (vo != null) {
-            queryWrapper = this.getWrapperByVO(vo);
+            queryWrapper = this.getWrapperByVO(vo, true);
         }
         if (queryWrapper == null) {
             queryWrapper = new QueryWrapper<>();
@@ -508,18 +508,30 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
     }
 
     /**
-     * @param vo 客户端提供的参数封装对象
+     * @param vo          客户端提供的参数封装对象
+     * @param isPageQuery 是否为分页查询 (如果是分页查询，则排序设置在分页参数对象中，否则需设置在 wrapper 中)
      * @return 数据库查询条件封装对象
      */
-    protected Wrapper<E> getWrapperByVO(V vo) {
+    protected Wrapper<E> getWrapperByVO(V vo, boolean isPageQuery) {
         final Class<V> voClazz = getClazz4VO();
         final Class<E> entityClazz = getClazz4Entity();
         QueryWrapper<E> wrapper = WrapperUtil.getWrapperByVO(entityClazz, voClazz, vo);
         if (wrapper == null) {
             wrapper = new QueryWrapper<>();
         }
+        String[] asc = listAsc();
+        if (!isPageQuery) {
+            if (asc != null && asc.length > 0) {
+                wrapper.orderByAsc(asc);
+            }
+            String[] desc = listDesc();
+            if (desc != null && desc.length > 0) {
+                wrapper.orderByDesc(desc);
+            }
+        }
         return wrapper;
     }
+
 
     /**
      * 将客户端的分页数据封装对象转换为mybatis plus查询插件的分页数据封装对象
@@ -531,8 +543,8 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         final Page<E> page = new Page<>();
         BeanUtils.copyProperties(pageInfo, page);
 
-        String[] desc = desc(pageInfo);
-        String[] asc = asc(pageInfo);
+        String[] desc = pageDesc(pageInfo);
+        String[] asc = pageAsc(pageInfo);
 
         if (desc != null) {
             page.setDesc(desc);
@@ -544,12 +556,30 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
     }
 
     /**
+     * 列表升序字段
+     *
+     * @return 列表升序字段数组
+     */
+    protected String[] listAsc() {
+        return null;
+    }
+
+    /**
+     * 列表降序字段
+     *
+     * @return 列表升序字段数组
+     */
+    protected String[] listDesc() {
+        return null;
+    }
+
+    /**
      * 分页列表升序字段
      *
      * @param pageInfo 分页参数封装对象
      * @return 分页列表升序字段数组
      */
-    protected String[] asc(Page<V> pageInfo) {
+    protected String[] pageAsc(Page<V> pageInfo) {
         return null;
     }
 
@@ -559,7 +589,8 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @param pageInfo 分页参数封装对象
      * @return 分页列表升序字段数组
      */
-    protected String[] desc(Page<V> pageInfo) {
+    protected String[] pageDesc(Page<V> pageInfo) {
         return null;
     }
+
 }
