@@ -30,6 +30,11 @@ public class SimpleQueryFieldHandlerChain implements QueryFieldHandlerChain {
     }
 
     @Override
+    public void reset() {
+        indexOfThreadLocal.set(0);
+    }
+
+    @Override
     public <E> void doHandler(String fieldName, Object value, Class type, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain) {
         Integer index = indexOfThreadLocal.get();
         if (index == handlers.size()) {
@@ -37,8 +42,7 @@ public class SimpleQueryFieldHandlerChain implements QueryFieldHandlerChain {
             return;
         }
 
-        final QueryFieldHandler queryFieldHandler = handlers.get(index);
-        index += 1;
+        final QueryFieldHandler queryFieldHandler = handlers.get(index++);
         indexOfThreadLocal.set(index);
 
         queryFieldHandler.handler(fieldName, value, type, wrapper, handlerChain);

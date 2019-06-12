@@ -27,7 +27,6 @@ public class WrapperUtil {
     }
 
     private static final QueryFieldHandlerChain handlerChain = new SimpleQueryFieldHandlerChain() {{
-        this.addHandler(new BeginQueryFieldHandler());
         // 处理 >= 字段
         this.addHandler(new BeginQueryFieldHandler());
         // 处理 <= 字段
@@ -73,6 +72,7 @@ public class WrapperUtil {
             Object value = compareDifferentResult.getFirstValue();
             Class type = compareDifferentResult.getType();
 
+            handlerChain.reset();
             handlerChain.doHandler(field, value, type, wrapper, handlerChain);
         }
         return wrapper;

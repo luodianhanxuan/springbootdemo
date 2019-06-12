@@ -14,4 +14,6 @@ public interface QueryFieldHandlerChain {
     <E> void doHandler(String fieldName, Object value, Class type, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain);
 
     void addHandler(QueryFieldHandler handler);
+
+    void reset();
 }
