@@ -3,7 +3,9 @@ package com.wangjg.framework.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +14,7 @@ import java.util.regex.Pattern;
  * @date 2018/10/26
  * Desc:
  */
+@SuppressWarnings("WeakerAccess")
 public class StringUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringUtil.class);
     private static final String TAG = "字符串处理工具类";
@@ -135,4 +138,58 @@ public class StringUtil {
         Matcher matcher = Pattern.compile(regex).matcher(s);
         return matcher.matches();
     }
+
+    public static List<String> getContentInSpecialRegion(String s, String beginWords, String endWords) {
+        List<String> list = new ArrayList<>();
+        String pattern = getPattern4ContentInSpecialRegion(beginWords, endWords);
+
+        Pattern p = Pattern.compile(pattern);
+        doGetContentInSpecialRegion(s, beginWords, endWords, p, list);
+        return list;
+    }
+
+    private static void doGetContentInSpecialRegion(String s, String beginWords, String endWords, Pattern p, List<String> list) {
+        Matcher m = p.matcher(s);
+        while (m.find()) {
+            String matchG = m.group();
+            String matchGValue = matchG.substring(beginWords.length());
+            doGetContentInSpecialRegion(matchGValue, beginWords, endWords, p, list);
+            boolean b = p.matcher(matchGValue).find();
+            if (b) {
+                matchGValue = matchGValue.substring(0, matchGValue.indexOf(beginWords));
+            } else {
+                matchGValue = matchGValue.substring(0, matchGValue.length() - endWords.length());
+            }
+            list.add(matchGValue.trim());
+        }
+    }
+
+    private static String getPattern4ContentInSpecialRegion(String beginWords, String endWords) {
+        //(\\$\\{[^}]*})
+        StringBuilder sb = new StringBuilder("(");
+
+        for (int i = 0; i < beginWords.trim().length(); i++) {
+            char c = beginWords.charAt(i);
+            sb.append("\\");
+            sb.append(c);
+        }
+        sb.append("[^");
+        sb.append(endWords);
+        sb.append("]*");
+
+        for (int i = 0; i < endWords.trim().length(); i++) {
+            char c = endWords.charAt(i);
+            sb.append("\\");
+            sb.append(c);
+        }
+        sb.append(")");
+
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        List<String> variableNames = getContentInSpecialRegion("123${a${d${e}}}456${b}789${c}0", "${", "}");
+        System.out.println(variableNames); // [e, d, a, b, c]
+    }
+
 }
