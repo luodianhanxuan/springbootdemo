@@ -1,14 +1,15 @@
 package com.wangjg.framework.pojo.vo.school;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import java.time.LocalDate;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.wangjg.framework.util.wrapper.annotation.BeginQuery;
+import com.wangjg.framework.util.wrapper.annotation.EndQuery;
+import com.wangjg.framework.util.wrapper.annotation.EqualQuery;
+import com.wangjg.framework.util.wrapper.annotation.LikeQuery;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -16,7 +17,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author wangjg
- * @since 2019-06-05
+ * @since 2019-07-11
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -29,28 +30,28 @@ public class SchoolVO implements Serializable {
     /**
      * 名称
      */
+    @EqualQuery
     private String name;
 
     /**
      * 学校地址
      */
+    @LikeQuery
     private String address;
 
     /**
      * 建校时间
      */
+    @BeginQuery
     private LocalDate birthday;
 
-    /**
-     * 创建时间
-     */
+    @EndQuery
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
+    @BeginQuery
     private LocalDateTime updateTime;
-
-
 
 }

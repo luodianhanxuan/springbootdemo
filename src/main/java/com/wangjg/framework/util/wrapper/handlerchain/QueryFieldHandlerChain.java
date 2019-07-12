@@ -3,6 +3,8 @@ package com.wangjg.framework.util.wrapper.handlerchain;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangjg.framework.util.wrapper.handler.QueryFieldHandler;
 
+import java.lang.reflect.Field;
+
 /**
  * @author wangjg
  * 2019-06-10
@@ -11,7 +13,7 @@ import com.wangjg.framework.util.wrapper.handler.QueryFieldHandler;
  */
 public interface QueryFieldHandlerChain {
 
-    <E> void doHandler(String fieldName, Object value, Class type, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain);
+    <E> void doHandler(String fieldName, Object value, Field field, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain);
 
     void addHandler(QueryFieldHandler handler);
 

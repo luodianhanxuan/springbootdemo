@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author wangjg
- * @since 2019-06-05
+ * @since 2019-07-11
  */
 @Service
 public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> implements ISchoolService {

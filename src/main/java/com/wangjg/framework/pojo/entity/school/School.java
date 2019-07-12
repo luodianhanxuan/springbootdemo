@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author wangjg
- * @since 2019-06-05
+ * @since 2019-07-11
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -44,9 +44,6 @@ public class School implements Serializable {
      */
     private LocalDate birthday;
 
-    /**
-     * 创建时间
-     */
     private LocalDateTime createTime;
 
     /**

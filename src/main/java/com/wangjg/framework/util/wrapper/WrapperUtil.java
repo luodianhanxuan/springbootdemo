@@ -10,6 +10,7 @@ import com.wangjg.framework.util.wrapper.handlerchain.QueryFieldHandlerChain;
 import com.wangjg.framework.util.wrapper.handlerchain.SimpleQueryFieldHandlerChain;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -68,12 +69,12 @@ public class WrapperUtil {
         final QueryWrapper<E> wrapper = new QueryWrapper<>();
         // 3. 根据属性集合构造初始化 wrapper 对象
         for (ReflectUtil.CompareDifferentResult compareDifferentResult : compareDifferentResults) {
-            String field = compareDifferentResult.getField();
+            String fieldName = compareDifferentResult.getFieldName();
             Object value = compareDifferentResult.getFirstValue();
-            Class type = compareDifferentResult.getType();
+            Field field = compareDifferentResult.getFirstField();
 
             handlerChain.reset();
-            handlerChain.doHandler(field, value, type, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
         }
         return wrapper;
     }

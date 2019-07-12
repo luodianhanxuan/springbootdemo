@@ -5,6 +5,8 @@ import com.wangjg.framework.util.wrapper.handler.QueryFieldHandler;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class SimpleQueryFieldHandlerChain implements QueryFieldHandlerChain {
     }
 
     @Override
-    public <E> void doHandler(String fieldName, Object value, Class type, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain) {
+    public <E> void doHandler(String fieldName, Object value, Field field, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain) {
         Integer index = indexOfThreadLocal.get();
         if (index == handlers.size()) {
             log.info(String.format("%s：处理器链处理完毕", TAG));
@@ -45,7 +47,7 @@ public class SimpleQueryFieldHandlerChain implements QueryFieldHandlerChain {
         final QueryFieldHandler queryFieldHandler = handlers.get(index++);
         indexOfThreadLocal.set(index);
 
-        queryFieldHandler.handler(fieldName, value, type, wrapper, handlerChain);
+        queryFieldHandler.handler(fieldName, value, field, wrapper, handlerChain);
     }
 
 }

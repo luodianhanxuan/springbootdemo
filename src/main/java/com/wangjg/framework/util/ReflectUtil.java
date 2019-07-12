@@ -1,5 +1,6 @@
 package com.wangjg.framework.util;
 
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,11 +16,11 @@ import java.util.regex.Pattern;
 
 /**
  * @author wangjg
- * @date 2018/9/30
+ * 2018/9/30
  * Desc:
  */
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ReflectUtil {
     private ReflectUtil() {
     }
@@ -91,14 +92,14 @@ public class ReflectUtil {
     /**
      * 判断两个相同类型的对象的属性值是否相等
      */
-    public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond) throws Exception {
+    public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond) {
         return comparePropertiesWithDifferentValue(first, sencond, null, null);
     }
 
     /**
      * 判断两个相同类型的对象的属性值是否相等
      */
-    public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond, String[] excludeFields) throws Exception {
+    public static <T> List<CompareDifferentResult> comparePropertiesWithDifferentValue(T first, T sencond, String[] excludeFields) {
         return comparePropertiesWithDifferentValue(first, sencond, null, excludeFields);
     }
 
@@ -121,34 +122,41 @@ public class ReflectUtil {
             return Boolean.FALSE;
         }*/
 
-        Field[] fields = first.getClass().getDeclaredFields();//获得所有字段
+        Field[] firstFields = first.getClass().getDeclaredFields();//获得所有字段
         PropertyDescriptor propertyDescriptor;
         List<CompareDifferentResult> differentFields = new ArrayList<>();
         CompareDifferentResult result;
         Object firstValue;
-        Object secondField;
-        for (Field field : fields) {
+        Object secondValue;
+        Field secondFiled;
+        for (Field firstField : firstFields) {
             if (fieldNames != null
                     && fieldNames.length > 0
-                    && !Arrays.asList(fieldNames).contains(field.getName())) {
+                    && !Arrays.asList(fieldNames).contains(firstField.getName())) {
                 continue;
             }
             if (excludeFields != null
                     && excludeFields.length > 0
-                    && Arrays.asList(excludeFields).contains(field.getName())) {
+                    && Arrays.asList(excludeFields).contains(firstField.getName())) {
                 continue;
             }
             try {
-                propertyDescriptor = new PropertyDescriptor(field.getName(), classType);//获得类中字段的属性描述
+                propertyDescriptor = new PropertyDescriptor(firstField.getName(), classType);//获得类中字段的属性描述
                 Method getMethod = propertyDescriptor.getReadMethod();//从属性描述中获得字段的get方法
+
                 //通过getMethod.invoke(obj)方法获得obj对象中该字段get方法返回的值
                 firstValue = getMethod.invoke(first);
-                secondField = getMethod.invoke(sencond);
-                if (!Objects.equals(firstValue, secondField)) {
-                    result = new CompareDifferentResult(getPrimitive2BoxTypeClassIfNeed(field.getType()));
-                    result.setField(underline(field.getName()));
+                secondValue = getMethod.invoke(sencond);
+
+                secondFiled = sencond.getClass().getDeclaredField(firstField.getName());
+
+                if (!Objects.equals(firstValue, secondValue)) {
+                    result = new CompareDifferentResult();
+                    result.setFieldName(underline(firstField.getName()));
                     result.setFirstValue(firstValue);
-                    result.setSencondValue(secondField);
+                    result.setSencondValue(secondValue);
+                    result.setFirstField(firstField);
+                    result.setSecondField(secondFiled);
                     differentFields.add(result);
                 }
             } catch (Exception e) {
@@ -158,57 +166,31 @@ public class ReflectUtil {
         return differentFields;
     }
 
-
+    /**
+     * 对比两个对象某个属性的结果封装
+     */
+    @Data
     public static class CompareDifferentResult {
-        private String field;
+        /**
+         * 字段名称
+         */
+        private String fieldName;
+        /**
+         * 第一个对象对应属性的值
+         */
         private Object firstValue;
+        /**
+         * 第二个对象对应属性的值
+         */
         private Object sencondValue;
-        private Class type;
-
-        public CompareDifferentResult(Class type) {
-            this.type = type;
-        }
-
-        @Override
-        public String toString() {
-            return "CompareDifferentResult{" +
-                    "field='" + field + '\'' +
-                    ", firstValue=" + firstValue +
-                    ", sencondValue=" + sencondValue +
-                    '}';
-        }
-
-        public String getField() {
-            return field;
-        }
-
-        public void setField(String field) {
-            this.field = field;
-        }
-
-        public Object getFirstValue() {
-            return firstValue;
-        }
-
-        public void setFirstValue(Object firstValue) {
-            this.firstValue = firstValue;
-        }
-
-        public Object getSencondValue() {
-            return sencondValue;
-        }
-
-        public void setSencondValue(Object sencondValue) {
-            this.sencondValue = sencondValue;
-        }
-
-        public Class getType() {
-            return type;
-        }
-
-        public void setType(Class type) {
-            this.type = type;
-        }
+        /**
+         * 第一个对象对应的属性对象
+         */
+        private Field firstField;
+        /**
+         * 第二个对象对应的属性对象
+         */
+        private Field secondField;
     }
 
     public static List<String> fields(Object obj) {
@@ -290,7 +272,6 @@ public class ReflectUtil {
      *
      * @param object     指定对象
      * @param fieldNames 属性集合
-     * @return
      */
     public static Map<String, Object> getFieldValue(Object object, String[] fieldNames) {
         Map<String, Object> data = new HashMap<>();
@@ -341,20 +322,20 @@ public class ReflectUtil {
             Field field = aClass.getDeclaredField(fieldName);
             getterMethodName = getterNameWithFieldName(field);
             if (StringUtil.isEmpty(getterMethodName)) {
-                LOGGER.error(String.format("%s：获取类【%s】属性【%s】getter方法名失败", TAG, className, field));
+                LOGGER.info(String.format("%s：获取类【%s】属性【%s】getter方法名失败", TAG, className, field));
                 return null;
             }
 
             Method getterMethod = aClass.getMethod(getterMethodName);
             return getterMethod.invoke(object);
         } catch (NoSuchFieldException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性", TAG, className, fieldName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性", TAG, className, fieldName));
         } catch (NoSuchMethodException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法", TAG, className, fieldName, getterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法", TAG, className, fieldName, getterMethodName));
         } catch (IllegalAccessException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法访问不到", TAG, className, fieldName, getterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法访问不到", TAG, className, fieldName, getterMethodName));
         } catch (InvocationTargetException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法调用失败", TAG, className, fieldName, getterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法调用失败", TAG, className, fieldName, getterMethodName));
         }
 
         return null;
@@ -398,7 +379,6 @@ public class ReflectUtil {
      * 返回首字母大写的字符串
      *
      * @param fieldName 字符串形式的属性
-     * @return
      */
     public static String fieldNameWithFirstLetterUpper(String fieldName) {
         String firstCharacter = fieldName.substring(0, 1).toUpperCase();
@@ -426,11 +406,7 @@ public class ReflectUtil {
             return Float.class;
         } else if (type == boolean.class) {
             return Boolean.class;
-        } else if (type == Character.class) {
-            return Character.class;
-        } else {
-            return type;
-        }
+        } else return type;
     }
 
     public static Object parseStrValueType2TypeIfNeeded(Class<?> type, String value) {
@@ -538,13 +514,13 @@ public class ReflectUtil {
             Method setterMethod = aClass.getMethod(setterMethodName, type);
             setterMethod.invoke(obj, value);
         } catch (NoSuchFieldException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性", TAG, className, fieldName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性", TAG, className, fieldName));
         } catch (NoSuchMethodException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法", TAG, className, fieldName, setterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法", TAG, className, fieldName, setterMethodName));
         } catch (IllegalAccessException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法访问不到", TAG, className, fieldName, setterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法访问不到", TAG, className, fieldName, setterMethodName));
         } catch (InvocationTargetException e) {
-            LOGGER.error(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法调用失败", TAG, className, fieldName, setterMethodName));
+            LOGGER.info(String.format("%s：类【%s】中没有【%s】属性的方法名为【%s】的方法调用失败", TAG, className, fieldName, setterMethodName));
         }
     }
 
