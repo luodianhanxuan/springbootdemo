@@ -6,6 +6,7 @@ import com.wangjg.framework.util.ReflectUtil;
 import com.wangjg.framework.util.wrapper.handler.BeginQueryFieldHandler;
 import com.wangjg.framework.util.wrapper.handler.EndQueryFieldHandler;
 import com.wangjg.framework.util.wrapper.handler.EqualQueryFieldHandler;
+import com.wangjg.framework.util.wrapper.handler.LikeQueryFieldHandler;
 import com.wangjg.framework.util.wrapper.handlerchain.QueryFieldHandlerChain;
 import com.wangjg.framework.util.wrapper.handlerchain.SimpleQueryFieldHandlerChain;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +33,10 @@ public class WrapperUtil {
         this.addHandler(new BeginQueryFieldHandler());
         // 处理 <= 字段
         this.addHandler(new EndQueryFieldHandler());
-        // 处理 == 字段 （将其放在处理链达到其他处理器链都不匹配之后最后以 equal 方式处理）
+        // 处理 == 字段
         this.addHandler(new EqualQueryFieldHandler());
+        // 处理字段 like %value%
+        this.addHandler(new LikeQueryFieldHandler());
     }};
 
 
