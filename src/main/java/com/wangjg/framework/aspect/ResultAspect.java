@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author wangjg
  * 2019-07-29
- * <p>
- * https://www.jianshu.com/p/efbc657e034c
  */
 @Component
 @Aspect
