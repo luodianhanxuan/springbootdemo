@@ -11,14 +11,10 @@ import java.util.regex.Pattern;
 
 /**
  * @author wangjg
- * @date 2018/10/26
  * Desc:
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class StringUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StringUtil.class);
-    private static final String TAG = "字符串处理工具类";
-
     private StringUtil() {
     }
 
