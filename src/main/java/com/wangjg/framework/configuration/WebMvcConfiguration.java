@@ -30,7 +30,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer, InitializingBean {
     public RequestResponseBodyMethodProcessor getReturnHandler() {
         List<HttpMessageConverter<?>> messageConverters = requestMappingHandlerAdapter.getMessageConverters();
         //初始化处理器
-        return new ReturnHandler(messageConverters);
+        return new ReturnValueHandler(messageConverters);
     }
 
     @Override

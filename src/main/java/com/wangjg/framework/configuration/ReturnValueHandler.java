@@ -19,9 +19,9 @@ import java.util.List;
  * 可以通过在 {@link com.wangjg.framework.controller.BaseController} 中添加异常处理方法处理）
  */
 @Slf4j
-public class ReturnHandler extends RequestResponseBodyMethodProcessor {
+public class ReturnValueHandler extends RequestResponseBodyMethodProcessor {
 
-    ReturnHandler(List<HttpMessageConverter<?>> converters) {
+    ReturnValueHandler(List<HttpMessageConverter<?>> converters) {
         super(converters);
     }
 
