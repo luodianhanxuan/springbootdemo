@@ -1,5 +1,6 @@
 package com.wangjg.framework.configuration;
 
+import com.wangjg.framework.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -42,6 +43,9 @@ public class ReturnValueHandler extends RequestResponseBodyMethodProcessor {
      */
     @Override
     public void handleReturnValue(Object o, MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest) throws IOException, HttpMediaTypeNotAcceptableException {
+        if (!(o instanceof Result)) {
+            o = Result.success(o);
+        }
         super.handleReturnValue(o, methodParameter, modelAndViewContainer, nativeWebRequest);
     }
 }

@@ -29,8 +29,7 @@ import java.util.List;
  * 2019-06-04
  */
 
-@SuppressWarnings({"unchecked", "WeakerAccess", "unused"
-        , "SpringJavaInjectionPointsAutowiringInspection", "RedundantThrows", "UnusedAssignment"})
+@SuppressWarnings({"unchecked", "WeakerAccess", "unused", "RedundantThrows", "SpringJavaInjectionPointsAutowiringInspection"})
 @Slf4j
 public class GeneralController<S extends IService<E>, E, V> extends BaseController {
 
@@ -41,7 +40,6 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      */
     @Autowired
     protected S service;
-
     /**
      * 事务管理器
      */
@@ -55,34 +53,17 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @return 填充保存数据过后的 vo
      */
     @PostMapping
-    public V save(@RequestBody V vo) {
+    public V save(@RequestBody V vo) throws Exception {
         if (vo == null) {
-            log.info(String.format("%s：vo 对象不能为 null", TAG));
-            // TODO
-            return null;
+            throw new DataCheckException(String.format("%s：vo 对象不能为 null", TAG));
         }
         log.info(vo.toString());
-        try {
-            this.dataCheck4Save(vo);
-        } catch (DataCheckException e) {
-            log.info(String.format("%s：保存VO【%s】验证不通过", TAG, vo));
-            // TODO
-            return vo;
-        }
-
+        this.dataCheck4Save(vo);
         Class<E> eClass = (Class<E>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         E entity;
-        try {
-            entity = eClass.newInstance();
-        } catch (Exception e) {
-            log.error(String.format("%s：创建【%s】类型对象失败：【%s】", TAG, eClass.getSimpleName(), e));
-            // TODO
-            return vo;
-        }
-
+        entity = eClass.newInstance();
         entity = this.vo2Entity(vo, entity);
         this.preSave(vo, entity);
-
         boolean b;
         if (this.saveInTransaction()) {
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -95,11 +76,9 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
                 throw ex;
             }
             txManager.commit(status);
-            b = true;
         } else {
-            b = doSave(vo, entity);
+            doSave(vo, entity);
         }
-
         return this.entity2vo(entity, vo);
     }
 
@@ -108,14 +87,12 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      *
      * @param vo     客户端提供的参数封装对象
      * @param entity 要保存的数据库映射对象
-     * @return 保存成功与否
      */
-    private boolean doSave(@RequestBody V vo, E entity) {
+    private void doSave(@RequestBody V vo, E entity) {
         boolean b;
         b = service.saveOrUpdate(entity);
         log.info(String.format("%s：实体【%s】保存%s", TAG, entity, b ? "成功" : "失败"));
         this.postSave(vo, entity);
-        return b;
     }
 
 
@@ -126,30 +103,17 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @return 删除的主键
      */
     @DeleteMapping("/{id}")
-    public String del(@PathVariable("id") String id) {
+    public String del(@PathVariable("id") String id) throws Exception {
         if (StringUtil.isEmpty(id)) {
-            log.info(String.format("%s：id 不能为空", TAG));
-            // TODO
-            return id;
+            throw new DataCheckException(String.format("%s：id 不能为空", TAG), TAG);
         }
 
         final E entity = service.getById(id);
         if (entity == null) {
-            log.info(String.format("%s：不存在ID【%s】", TAG, id));
-            // TODO
-            return id;
+            throw new DataCheckException(String.format("%s：不存在ID【%s】", TAG, id), TAG);
         }
-        try {
-            dataCheck4DelOne(entity);
-        } catch (DataCheckException e) {
-            log.info(String.format("%s：删除数据【%s】验证不通过", TAG, entity));
-            // TODO
-            return id;
-        }
-
+        dataCheck4DelOne(entity);
         this.preDelOne(id, entity);
-
-        boolean b;
         if (this.delInTransaction()) {
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
@@ -161,9 +125,8 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
                 throw ex;
             }
             txManager.commit(status);
-            b = true;
         } else {
-            b = this.doDelOne(id, entity);
+            this.doDelOne(id, entity);
         }
         return id;
     }
@@ -173,13 +136,11 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      *
      * @param id     主键
      * @param entity 根据主键查询出来的数据库映射对象
-     * @return 删除成功与否
      */
-    private boolean doDelOne(String id, E entity) {
+    private void doDelOne(String id, E entity) {
         final boolean b = service.removeById(id);
         log.info(String.format("%s：删除ID【%s】数据%s", TAG, id, b ? "成功" : "失败"));
         this.postDelOne(id, entity);
-        return b;
     }
 
     /**
@@ -189,25 +150,14 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @return 删除成功与否
      */
     @DeleteMapping
-    public boolean del(String[] ids) {
+    public boolean del(String[] ids) throws Exception {
         if (ids == null || ids.length <= 0) {
-            log.info(String.format("%s：要删除的 id 为空", TAG));
-            // TODO
-            return false;
+            throw new DataCheckException(String.format("%s：要删除的 id 为空", TAG), "要删除的 id 为空");
         }
 
         List<String> idList = Arrays.asList(ids);
-
         Collection<E> entities = service.listByIds(idList);
-
-        try {
-            dataCheck4DelOne(entities);
-        } catch (DataCheckException e) {
-            log.info(String.format("%s：删除数据验证不通过", TAG));
-            // TODO
-            return false;
-        }
-
+        dataCheck4DelOne(entities);
         this.preDelList(idList, entities);
 
         boolean b;
@@ -226,7 +176,6 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
         } else {
             b = doDelList(idList, entities);
         }
-        // TODO
         return b;
     }
 
@@ -251,36 +200,19 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      * @return 主键对应的本表数据
      */
     @GetMapping("/{id}")
-    public V get(@PathVariable("id") String id) {
+    public V get(@PathVariable("id") String id) throws Exception {
         if (StringUtil.isEmpty(id)) {
-            log.info(String.format("%s：id 不能为空", TAG));
-            // TODO
-            return null;
+            throw new DataCheckException(String.format("%s：id 不能为空", TAG), "id 不能为空");
         }
 
         final E entity = service.getById(id);
         if (entity == null) {
-            // TODO
-            return null;
+            throw new DataCheckException(String.format("%s：id【%s】 不存在", TAG, id), "id 不存在");
         }
 
         Class<V> vClass = getClazz4VO();
-        V vo;
-        try {
-            vo = vClass.newInstance();
-        } catch (Exception e) {
-            log.error(String.format("%s：创建【%s】类型对象失败：【%s】", TAG, vClass.getSimpleName(), e));
-            // TODO
-            return null;
-        }
-
-        if (vo == null) {
-            // TODO
-            return null;
-        }
-
+        V vo = vClass.newInstance();
         vo = this.entity2vo(entity, vo);
-        // TODO
         return vo;
     }
 
@@ -292,22 +224,14 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      */
     @GetMapping("/list")
     public List<V> list(V vo) {
-        if (vo == null) {
-            log.info(String.format("%s：系统异常 vo 不能为 null", TAG));
-            // TODO
-            return null;
-        }
-
         this.preListCondition(vo);
 
         Wrapper<E> queryWrapper = this.getWrapperByVO(vo, false);
         if (queryWrapper == null) {
             queryWrapper = new QueryWrapper<>();
         }
-
         final List<E> entityList = service.list(queryWrapper);
 
-        // TODO
         return this.entityList2VoList(entityList);
     }
 
@@ -319,11 +243,7 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
      */
     @PostMapping("/page")
     public Page<V> page(@RequestBody PageSearch<V> pageSearch) {
-        if (pageSearch == null) {
-            log.info(String.format("%s：系统异常 pageSearch 不能为 null", TAG));
-            // TODO
-            return null;
-        }
+
         Page<V> pageInfo = pageSearch.getPage();
         Page<E> page = this.getPageCondition(pageInfo);
         final V vo = pageSearch.getSearch();
@@ -339,7 +259,6 @@ public class GeneralController<S extends IService<E>, E, V> extends BaseControll
 
         final IPage<E> pageData = service.page(page, queryWrapper);
         if (pageData == null) {
-            // TODO
             return new Page<>();
         }
         final List<E> records = pageData.getRecords();
