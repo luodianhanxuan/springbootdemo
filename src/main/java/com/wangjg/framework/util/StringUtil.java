@@ -1,8 +1,5 @@
 package com.wangjg.framework.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -160,22 +157,62 @@ public class StringUtil {
         }
     }
 
+    private static List<Character> specialCharacter4Regexp = new ArrayList<Character>() {{
+        this.add('a');
+        this.add('b');
+        this.add('f');
+        this.add('n');
+        this.add('r');
+        this.add('t');
+        this.add('v');
+        this.add('\\');
+        this.add('\'');
+        this.add('"');
+        this.add('0');
+        this.add('d');
+        this.add('^');
+        this.add('$');
+        this.add('.');
+        this.add('[');
+        this.add(']');
+        this.add('*');
+        this.add('?');
+        this.add('+');
+        this.add('{');
+        this.add('}');
+        this.add('|');
+        this.add('(');
+        this.add(')');
+    }};
+
     private static String getPattern4ContentInSpecialRegion(String beginWords, String endWords) {
         //(\\$\\{[^}]*})
+        // (<li>((?!</li>).)*</li>)
         StringBuilder sb = new StringBuilder("(");
 
         for (int i = 0; i < beginWords.trim().length(); i++) {
             char c = beginWords.charAt(i);
-            sb.append("\\");
+            if (specialCharacter4Regexp.contains(c)) {
+                sb.append("\\");
+            }
             sb.append(c);
         }
-        sb.append("[^");
-        sb.append(endWords);
-        sb.append("]*");
+        sb.append("((?!");
+//        sb.append(endWords);
+        for (int i = 0; i < endWords.trim().length(); i++) {
+            char c = endWords.charAt(i);
+            if (specialCharacter4Regexp.contains(c)) {
+                sb.append("\\");
+            }
+            sb.append(c);
+        }
+        sb.append(").)*");
 
         for (int i = 0; i < endWords.trim().length(); i++) {
             char c = endWords.charAt(i);
-            sb.append("\\");
+            if (specialCharacter4Regexp.contains(c)) {
+                sb.append("\\");
+            }
             sb.append(c);
         }
         sb.append(")");
