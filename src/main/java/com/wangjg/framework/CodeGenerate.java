@@ -46,6 +46,7 @@ public class CodeGenerate {
 //        gc.setOutputDir(projectPath + "/src/main/java");
         gc.setAuthor("wangjg");
         gc.setOpen(false);
+        gc.setFileOverride(true);
         // gc.setSwagger2(true); 实体属性 Swagger2 注解
         mpg.setGlobalConfig(gc);
 
@@ -166,7 +167,10 @@ public class CodeGenerate {
 //        strategy.setSuperEntityClass("com.baomidou.ant.common.BaseEntity");
         strategy.setEntityLombokModel(true);
         strategy.setRestControllerStyle(true);
-//        strategy.setSuperControllerClass("com.baomidou.ant.common.BaseController");
+        strategy.setSuperControllerClass("com.wangjg.framework.controller.GeneralController");
+        strategy.setSuperServiceClass("com.wangjg.framework.service.GeneralService");
+        strategy.setSuperServiceImplClass("com.wangjg.framework.service.impl.GeneralServiceImpl");
+
         strategy.setInclude(scanner("表名，多个英文逗号分割").split(","));
 //        strategy.setSuperEntityColumns("id");
         strategy.setControllerMappingHyphenStyle(true);

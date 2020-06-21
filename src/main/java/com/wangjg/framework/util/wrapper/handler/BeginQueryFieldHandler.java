@@ -19,7 +19,7 @@ public class BeginQueryFieldHandler implements QueryFieldHandler {
                 && field.getAnnotationsByType(BeginQuery.class).length > 0) {
             wrapper.ge(true, ReflectUtil.underline(fieldName), value);
         } else {
-            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper);
         }
     }
 }

@@ -1,20 +1,21 @@
 package com.wangjg.framework.pojo.vo.teacher;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+
+import com.wangjg.framework.util.wrapper.annotation.EqualQuery;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * <p>
- * 教师表
+ * 学校信息
  * </p>
  *
  * @author wangjg
- * @since 2019-07-30
+ * @since 2020-06-21
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,25 +23,29 @@ public class TeacherVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * id
+     */
+    @EqualQuery
     private Integer id;
 
     /**
-     * 教师名称
+     * 名称
      */
     private String name;
 
     /**
-     * 教师年龄
+     * 年龄
      */
     private Integer age;
 
     /**
-     * 教师生日
+     * 生日
      */
     private LocalDate birthday;
 
     /**
-     * 性别
+     * 性别：1男，2女
      */
     private Integer gender;
 

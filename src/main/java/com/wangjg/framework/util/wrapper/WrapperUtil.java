@@ -33,10 +33,10 @@ public class WrapperUtil {
         this.addHandler(new BeginQueryFieldHandler());
         // 处理 <= 字段
         this.addHandler(new EndQueryFieldHandler());
-        // 处理 == 字段
-        this.addHandler(new EqualQueryFieldHandler());
         // 处理字段 like %value%
         this.addHandler(new LikeQueryFieldHandler());
+        // 处理 == 字段
+        this.addHandler(new EqualQueryFieldHandler());
     }};
 
 
@@ -77,7 +77,7 @@ public class WrapperUtil {
             Field field = compareDifferentResult.getFirstField();
 
             handlerChain.reset();
-            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper);
         }
         return wrapper;
     }

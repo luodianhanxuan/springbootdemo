@@ -1,5 +1,6 @@
 package com.wangjg.framework.controller.teacher;
 
+
 import com.wangjg.framework.controller.GeneralController;
 import com.wangjg.framework.pojo.entity.teacher.Teacher;
 import com.wangjg.framework.pojo.vo.teacher.TeacherVO;
@@ -9,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <p>
- * 教师表 前端控制器
+ * 学校信息 前端控制器
  * </p>
  *
  * @author wangjg
- * @since 2019-07-30
+ * @since 2020-06-21
  */
 @RestController
 @RequestMapping("/teacher")

@@ -21,7 +21,7 @@ public class EndQueryFieldHandler implements QueryFieldHandler {
                 && field.getAnnotationsByType(EndQuery.class).length > 0) {
             wrapper.le(true, ReflectUtil.underline(fieldName), value);
         } else {
-            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper);
         }
     }
 }

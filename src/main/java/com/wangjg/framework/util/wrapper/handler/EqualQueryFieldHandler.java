@@ -2,11 +2,9 @@ package com.wangjg.framework.util.wrapper.handler;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangjg.framework.util.ReflectUtil;
-import com.wangjg.framework.util.wrapper.annotation.BeginQuery;
 import com.wangjg.framework.util.wrapper.annotation.EqualQuery;
 import com.wangjg.framework.util.wrapper.handlerchain.QueryFieldHandlerChain;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 /**
@@ -21,7 +19,7 @@ public class EqualQueryFieldHandler implements QueryFieldHandler {
                 && field.getAnnotationsByType(EqualQuery.class).length > 0) {
             wrapper.eq(true, ReflectUtil.underline(fieldName), value);
         } else {
-            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper);
         }
 
     }

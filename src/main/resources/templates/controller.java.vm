@@ -1,10 +1,7 @@
 package ${package.Controller};
 
+
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.wangjg.framework.controller.GeneralController;
-import ${package.Entity}.${entity};
-import ${package.Service}.I${entity}Service;
-import ${cfg.voPackage}.${entity}VO;
 #if(${restControllerStyle})
 import org.springframework.web.bind.annotation.RestController;
 #else
@@ -12,6 +9,9 @@ import org.springframework.stereotype.Controller;
 #end
 #if(${superControllerClassPackage})
 import ${superControllerClassPackage};
+import ${package.Service}.${table.serviceName};
+import ${package.Entity}.${entity};
+import ${cfg.voPackage}.${entity}VO;
 #end
 
 /**
@@ -28,16 +28,7 @@ import ${superControllerClassPackage};
 @Controller
 #end
 @RequestMapping("#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
-#if(${kotlin})
-class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
-
-#else
-#if(${superControllerClass})
-public class ${table.controllerName} extends ${superControllerClass} {
-#else
-public class ${table.controllerName} extends GeneralController<I${entity}Service, ${entity}, ${entity}VO>{
-#end
+public class ${table.controllerName} extends ${superControllerClass}<${table.serviceName}, ${entity}, ${entity}VO> {
 
 }
 
-#end

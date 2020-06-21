@@ -1,9 +1,10 @@
 package com.wangjg.framework.service.impl.school;
 
-import com.wangjg.framework.pojo.entity.school.School;
 import com.wangjg.framework.mapper.school.SchoolMapper;
+import com.wangjg.framework.pojo.entity.school.School;
+import com.wangjg.framework.pojo.vo.school.SchoolVO;
+import com.wangjg.framework.service.impl.GeneralServiceImpl;
 import com.wangjg.framework.service.school.ISchoolService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,6 +16,6 @@ import org.springframework.stereotype.Service;
  * @since 2019-07-11
  */
 @Service
-public class SchoolServiceImpl extends ServiceImpl<SchoolMapper, School> implements ISchoolService {
+public class SchoolServiceImpl extends GeneralServiceImpl<SchoolMapper, School, SchoolVO> implements ISchoolService {
 
 }

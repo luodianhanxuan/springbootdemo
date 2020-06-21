@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
- * 教师表 Mapper 接口
+ * 学校信息 Mapper 接口
  * </p>
  *
  * @author wangjg
- * @since 2019-07-30
+ * @since 2020-06-21
  */
 public interface TeacherMapper extends BaseMapper<Teacher> {
 

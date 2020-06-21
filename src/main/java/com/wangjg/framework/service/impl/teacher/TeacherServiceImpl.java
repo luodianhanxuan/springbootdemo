@@ -1,20 +1,22 @@
 package com.wangjg.framework.service.impl.teacher;
 
 import com.wangjg.framework.pojo.entity.teacher.Teacher;
+import com.wangjg.framework.pojo.vo.teacher.TeacherVO;
 import com.wangjg.framework.mapper.teacher.TeacherMapper;
 import com.wangjg.framework.service.teacher.ITeacherService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wangjg.framework.service.impl.GeneralServiceImpl;
 import org.springframework.stereotype.Service;
+
 
 /**
  * <p>
- * 教师表 服务实现类
+ * 学校信息 服务实现类
  * </p>
  *
  * @author wangjg
- * @since 2019-07-30
+ * @since 2020-06-21
  */
 @Service
-public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> implements ITeacherService {
+public class TeacherServiceImpl extends GeneralServiceImpl<TeacherMapper, Teacher, TeacherVO> implements ITeacherService {
 
 }

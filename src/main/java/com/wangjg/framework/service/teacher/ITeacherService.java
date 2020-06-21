@@ -1,16 +1,18 @@
 package com.wangjg.framework.service.teacher;
 
 import com.wangjg.framework.pojo.entity.teacher.Teacher;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.wangjg.framework.pojo.vo.teacher.TeacherVO;
+import com.wangjg.framework.service.GeneralService;
+
 
 /**
  * <p>
- * 教师表 服务类
+ * 学校信息 服务类
  * </p>
  *
  * @author wangjg
- * @since 2019-07-30
+ * @since 2020-06-21
  */
-public interface ITeacherService extends IService<Teacher> {
+public interface ITeacherService extends GeneralService<Teacher, TeacherVO> {
 
 }

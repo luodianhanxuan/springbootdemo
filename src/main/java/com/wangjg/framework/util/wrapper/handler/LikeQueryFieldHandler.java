@@ -20,7 +20,7 @@ public class LikeQueryFieldHandler implements QueryFieldHandler {
                 && field.getAnnotationsByType(LikeQuery.class).length > 0) {
             wrapper.like(true, ReflectUtil.underline(fieldName), value);
         } else {
-            handlerChain.doHandler(fieldName, value, field, wrapper, handlerChain);
+            handlerChain.doHandler(fieldName, value, field, wrapper);
         }
 
     }

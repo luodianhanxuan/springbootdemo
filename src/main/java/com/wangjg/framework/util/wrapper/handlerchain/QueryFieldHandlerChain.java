@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
  */
 public interface QueryFieldHandlerChain {
 
-    <E> void doHandler(String fieldName, Object value, Field field, QueryWrapper<E> wrapper, QueryFieldHandlerChain handlerChain);
+    <E> void doHandler(String fieldName, Object value, Field field, QueryWrapper<E> wrapper);
 
     void addHandler(QueryFieldHandler handler);
 
